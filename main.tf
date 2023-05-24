@@ -5,7 +5,6 @@
 #  - Public Subnets
 #  - Private Subnets
 #  - NAT Gateways
-#
 #----------------------------------------------------------
 
 provider "aws" {
