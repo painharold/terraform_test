@@ -11,6 +11,8 @@ provider "aws" {
   region = "eu-central-1"
 }
 
+data "aws_availability_zones" "zones" {}
+
 #Creating VPC
 resource "aws_vpc" "my_vpc" {
   cidr_block       = "10.0.0.0/16"
@@ -35,9 +37,11 @@ resource "aws_internet_gateway" "gw" {
 
 #Creating Public Subnets
 resource "aws_subnet" "public" {
+  count = length(data.aws_availability_zones.zones.names)
   vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = "10.0.1.0/24"
+  cidr_block = cidrsubnet("10.0.0.0/16", 8, count.index)
   map_public_ip_on_launch = true
+  availability_zone = data.aws_availability_zones.zones.names[count.index]
 
   tags = {
     Name = "Public Subnet"
@@ -62,14 +66,16 @@ resource "aws_route_table" "public" {
 
 #Creating Public Route Table Association
 resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.public.id
-  route_table_id = aws_route_table.public.id
+  count = length(aws_subnet.public.*.id)
+  subnet_id      = element(aws_subnet.public.*.id, count.index)
+  route_table_id = element(aws_route_table.public.*.id, count.index)
 }
 
 #-----NAT Gateways with Elastic IPs--------------------------
 
 #Creating Elastic IP
 resource "aws_eip" "main" {
+  count = length(data.aws_availability_zones.zones.names)
   vpc      = true
 
   tags = {
@@ -80,8 +86,9 @@ resource "aws_eip" "main" {
 
 #Creating NAT Gateways
 resource "aws_nat_gateway" "ngw" {
-  allocation_id = aws_eip.main.id
-  subnet_id     = aws_subnet.public.id
+  count = length(data.aws_availability_zones.zones.names)
+  allocation_id = element(aws_eip.main.*.id, count.index)
+  subnet_id     = element(aws_subnet.public.*.id, count.index)
 
   tags = {
     Name = "NAT Gateway"
@@ -93,8 +100,10 @@ resource "aws_nat_gateway" "ngw" {
 
 #Creating Private Subnets
 resource "aws_subnet" "private" {
+  count = length(data.aws_availability_zones.zones.names)
   vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = "10.0.2.0/24"
+  cidr_block = cidrsubnet("10.0.0.0/16", 8, 20 + count.index)
+  availability_zone = data.aws_availability_zones.zones.names[count.index]
 
   tags = {
     Name = "Private Subnet"
@@ -104,11 +113,12 @@ resource "aws_subnet" "private" {
 
 #Creating Private Route Table
 resource "aws_route_table" "private" {
+  count = length(data.aws_availability_zones.zones.names)
   vpc_id = aws_vpc.my_vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.ngw.id
+    gateway_id = element(aws_nat_gateway.ngw.*.id, count.index)
   }
 
   tags = {
@@ -119,8 +129,9 @@ resource "aws_route_table" "private" {
 
 #Creating Private Route Table Association
 resource "aws_route_table_association" "private" {
-  subnet_id      = aws_subnet.private.id
-  route_table_id = aws_route_table.private.id
+  count = length(aws_subnet.private.*.id)
+  subnet_id      = element(aws_subnet.private.*.id, count.index)
+  route_table_id = element(aws_route_table.private.*.id, count.index)
 }
 
 output "vpc_id" {
