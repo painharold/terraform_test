@@ -70,6 +70,9 @@ resource "aws_instance" "webserver" {
   vpc_security_group_ids = [aws_security_group.sg-wp.id]
   user_data              = file("script.sh")
 
+
+
+
   tags = {
     Name  = "Web Server"
     Project = "Terraform Test Project"
