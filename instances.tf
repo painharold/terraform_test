@@ -69,6 +69,7 @@ resource "aws_instance" "webserver" {
   subnet_id = element(aws_subnet.private.*.id, count.index)
   vpc_security_group_ids = [aws_security_group.sg-wp.id]
   user_data              = file("script.sh")
+  key_name = "my_pair"
 
   tags = {
     Name  = "Web Server"
