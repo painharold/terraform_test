@@ -13,7 +13,7 @@ provider "aws" {
 
 data "aws_availability_zones" "zones" {}
 
-#Creating VPC
+#Create VPC
 resource "aws_vpc" "my_vpc" {
   cidr_block       = "10.0.0.0/16"
 
@@ -23,7 +23,7 @@ resource "aws_vpc" "my_vpc" {
   }
 }
 
-#Creating Internet Gateway
+#Create Internet Gateway
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.my_vpc.id
 
@@ -35,7 +35,7 @@ resource "aws_internet_gateway" "gw" {
 
 #-------------Public Subnets and Routing----------------------------------------
 
-#Creating Public Subnets
+#Create Public Subnets
 resource "aws_subnet" "public" {
   count = length(data.aws_availability_zones.zones.names)
   vpc_id     = aws_vpc.my_vpc.id
@@ -49,7 +49,7 @@ resource "aws_subnet" "public" {
   }
 }
 
-#Creating Public Route Table
+#Create Public Route Table
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.my_vpc.id
 
@@ -64,7 +64,7 @@ resource "aws_route_table" "public" {
   }
 }
 
-#Creating Public Route Table Association
+#Create Public Route Table Association
 resource "aws_route_table_association" "public" {
   count = length(aws_subnet.public.*.id)
   subnet_id      = element(aws_subnet.public.*.id, count.index)
@@ -73,7 +73,7 @@ resource "aws_route_table_association" "public" {
 
 #-----NAT Gateways with Elastic IPs--------------------------
 
-#Creating Elastic IP
+#Create Elastic IP
 resource "aws_eip" "main" {
   count = length(data.aws_availability_zones.zones.names)
   vpc      = true
@@ -84,7 +84,7 @@ resource "aws_eip" "main" {
   }
 }
 
-#Creating NAT Gateways
+#Create NAT Gateways
 resource "aws_nat_gateway" "ngw" {
   count = length(data.aws_availability_zones.zones.names)
   allocation_id = element(aws_eip.main.*.id, count.index)
@@ -98,7 +98,7 @@ resource "aws_nat_gateway" "ngw" {
 
 #-------------Private Subnets and Routing----------------------------------------
 
-#Creating Private Subnets
+#Create Private Subnets
 resource "aws_subnet" "private" {
   count = length(data.aws_availability_zones.zones.names)
   vpc_id     = aws_vpc.my_vpc.id
@@ -111,7 +111,7 @@ resource "aws_subnet" "private" {
   }
 }
 
-#Creating Private Route Table
+#Create Private Route Table
 resource "aws_route_table" "private" {
   count = length(data.aws_availability_zones.zones.names)
   vpc_id = aws_vpc.my_vpc.id
@@ -127,7 +127,7 @@ resource "aws_route_table" "private" {
   }
 }
 
-#Creating Private Route Table Association
+#Create Private Route Table Association
 resource "aws_route_table_association" "private" {
   count = length(aws_subnet.private.*.id)
   subnet_id      = element(aws_subnet.private.*.id, count.index)

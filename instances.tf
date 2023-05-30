@@ -1,3 +1,4 @@
+# Get latest ami of Amazon Linux
 data "aws_ami" "latest_amazon_linux" {
   owners      = ["amazon"]
   most_recent = true
@@ -6,7 +7,9 @@ data "aws_ami" "latest_amazon_linux" {
     values = ["amzn2-ami-hvm-*-x86_64-gp2"]
   }
 }
+#-------------Security Groups----------------------------------------
 
+# Create a security group for load balancer
 resource "aws_security_group" "sg-elb" {
   name   = "ELB Security Group"
   vpc_id = aws_vpc.my_vpc.id
@@ -31,7 +34,7 @@ resource "aws_security_group" "sg-elb" {
   }
 }
 
-
+# Create a security group for web servers
 resource "aws_security_group" "sg-wp" {
   name   = "WebServer Security Group"
   vpc_id = aws_vpc.my_vpc.id
@@ -51,12 +54,14 @@ resource "aws_security_group" "sg-wp" {
   }
 
   tags = {
-    Name = "Security Group ELB"
+    Name = "Security Group WEB"
     Project = "Terraform Test Project"
   }
 }
 
+#-------------Instances----------------------------------------
 
+# Create webservers
 resource "aws_instance" "webserver" {
   count = length(aws_subnet.private.*.id)
   ami                    = data.aws_ami.latest_amazon_linux.id
@@ -66,17 +71,20 @@ resource "aws_instance" "webserver" {
   user_data              = file("script.sh")
 
   tags = {
-    Name  = "Web Server Build by Terraform"
+    Name  = "Web Server"
     Project = "Terraform Test Project"
   }
 
   depends_on = [aws_nat_gateway.ngw]
 }
 
+#-------------Load Balancer----------------------------------------
+
+# Create a new load balancer
 resource "aws_elb" "elb" {
   name               = "WebServer-ELB"
   security_groups    = [aws_security_group.sg-elb.id]
-  subnets = aws_subnet.private.*.id
+  subnets = aws_subnet.public.*.id
 
   listener {
     instance_port     = 80
@@ -92,7 +100,7 @@ resource "aws_elb" "elb" {
     unhealthy_threshold = 2
   }
   tags = {
-    name = "WebServer ELB"
+    name = "ELB"
     Project = "Terraform Test Project"
   }
 }
