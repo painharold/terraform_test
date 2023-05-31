@@ -76,7 +76,7 @@ resource "aws_route_table_association" "public" {
 #Create Elastic IP
 resource "aws_eip" "main" {
   count = length(data.aws_availability_zones.zones.names)
-  vpc      = true
+  domain   = "vpc"
 
   tags = {
     Name = "Elastic IP For NAT"
