@@ -1,15 +1,12 @@
 #----------------------------------------------------------
 # Terraform Test Project
+# Network Module
 #  - VPC
 #  - Internet Gateway
 #  - Public Subnets
 #  - Private Subnets
 #  - NAT Gateways
 #----------------------------------------------------------
-
-provider "aws" {
-  region = "eu-central-1"
-}
 
 data "aws_availability_zones" "zones" {}
 
@@ -132,16 +129,4 @@ resource "aws_route_table_association" "private" {
   count = length(aws_subnet.private.*.id)
   subnet_id      = element(aws_subnet.private.*.id, count.index)
   route_table_id = element(aws_route_table.private.*.id, count.index)
-}
-
-output "vpc_id" {
-  value = aws_vpc.my_vpc.id
-}
-
-output "vpc_cidr" {
-  value = aws_vpc.my_vpc.cidr_block
-}
-
-output "public_subnets_id" {
-  value = aws_subnet.public[*].id
 }

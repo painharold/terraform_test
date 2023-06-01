@@ -4,3 +4,6 @@
 /terraform.tfstate
 /terraform.tfstate.backup
 /.terraform.tfstate.lock.info
+/test_project/.terraform.lock.hcl
+/test_project/.terraform.tfstate.lock.info
+/test_project/terraform.tfstate
