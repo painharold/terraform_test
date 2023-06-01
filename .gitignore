@@ -1,14 +1,6 @@
 /.idea/
-/.terraform/
-/.terraform.lock.hcl
-/terraform.tfstate
-/terraform.tfstate.backup
-/.terraform.tfstate.lock.info
 /test_project/.terraform.lock.hcl
 /test_project/.terraform.tfstate.lock.info
 /test_project/terraform.tfstate
 /test_project/terraform.tfstate.backup
-/test_project/.terraform/providers/registry.terraform.io/hashicorp/aws/5.0.1/darwin_arm64/terraform-provider-aws_v5.0.1_x5
-/test_project/.terraform/modules/modules.json
-/test_project/.terraform/providers/registry.terraform.io/hashicorp/random/3.5.1/darwin_arm64/terraform-provider-random_v3.5.1_x5
 /test_project/.terraform/

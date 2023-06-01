@@ -7,7 +7,7 @@
 
 # Generate Password
 resource "random_string" "rds_password" {
-  length           = 12
+  length           = var.pass_length
   special          = true
   override_special = "!#$&@"
 }

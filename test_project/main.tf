@@ -4,7 +4,7 @@
 #----------------------------------------------------------
 
 provider "aws" {
-  region = "eu-central-1"
+  region = var.region
 }
 
 module "vpc" {
@@ -15,7 +15,7 @@ module "vpc" {
 resource "aws_launch_template" "web" {
   name                   = "WP-WebServer"
   image_id               = data.aws_ami.latest_amazon_linux.id
-  instance_type          = "t3.micro"
+  instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.sg-wp.id]
   user_data              = base64encode(templatefile("script.sh.tpl", {
         db_name     = aws_db_instance.db-mysql.db_name,
@@ -30,8 +30,8 @@ resource "aws_launch_template" "web" {
 # Create Autoscaling Group
 resource "aws_autoscaling_group" "web" {
   name                = "WebServer-ASG-Ver-${aws_launch_template.web.latest_version}"
-  min_size            = 2
-  max_size            = 3
+  min_size            = var.asg_min_size
+  max_size            = var.asg_max_size
   min_elb_capacity    = 2
   health_check_type   = "ELB"
   vpc_zone_identifier = module.vpc.public_subnets_id
