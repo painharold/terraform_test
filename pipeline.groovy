@@ -105,7 +105,7 @@ pipeline {
                                  string(credentialsId: 'access_key', variable: 'AWS_SECRET_ACCESS_KEY')]) {
                             sh """
                                 terraform init
-                                terraform destroy --auto-approve
+                                AWS_REGION=${params.Region} terraform destroy --auto-approve
                             """
                         }
                         println('------------------ Destroy destruction was successfully complete ------------------')
