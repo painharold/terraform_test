@@ -8,8 +8,7 @@
 # Generate Password
 resource "random_string" "rds_password" {
   length           = var.pass_length
-  special          = true
-  override_special = "!#$&@"
+  special          = false
 }
 
 # Create Password in AWS
