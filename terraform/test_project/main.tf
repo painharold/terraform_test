@@ -6,9 +6,18 @@
 provider "aws" {
   region = var.region
 }
+# Terraform Remote State
+terraform {
+  backend "s3" {
+    bucket = "dmitry-maslov-my-terraform-test-project-state"
+    key    = "terraform_test_project/terraform.tfstate"
+    region = "eu-central-1"
+  }
+}
 
 module "vpc" {
-  source = "../modules/network"
+  source   = "../modules/network"
+  vpc_cidr = var.cidr_block
 }
 
 # Create Launch Template
@@ -18,11 +27,11 @@ resource "aws_launch_template" "web" {
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.sg-wp.id]
   user_data              = base64encode(templatefile("script.sh.tpl", {
-        db_name     = aws_db_instance.db-mysql.db_name,
-        db_user     = aws_db_instance.db-mysql.username,
-        db_password = data.aws_ssm_parameter.my_rds_password.value
-        db_hostname = aws_db_instance.db-mysql.endpoint
-      }))
+    db_name     = aws_db_instance.db-mysql.db_name,
+    db_user     = aws_db_instance.db-mysql.username,
+    db_password = data.aws_ssm_parameter.my_rds_password.value
+    db_hostname = aws_db_instance.db-mysql.endpoint
+  }))
 
   depends_on = [aws_db_instance.db-mysql]
 }
@@ -44,7 +53,7 @@ resource "aws_autoscaling_group" "web" {
 
   dynamic "tag" {
     for_each = {
-      Name   = "WebServer in ASG-v${aws_launch_template.web.latest_version}"
+      Name    = "WebServer in ASG-v${aws_launch_template.web.latest_version}"
       Project = "Terraform Test Project"
     }
     content {

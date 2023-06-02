@@ -1,6 +1,7 @@
 /.idea/
-/test_project/.terraform.lock.hcl
-/test_project/.terraform.tfstate.lock.info
-/test_project/terraform.tfstate
-/test_project/terraform.tfstate.backup
-/test_project/.terraform/
+/terraform/test_project/.terraform.lock.hcl
+/terraform/test_project/.terraform.tfstate.lock.info
+/terraform/test_project/terraform.tfstate
+/terraform/test_project/terraform.tfstate.backup
+/terraform/test_project/.terraform/
+/lib/

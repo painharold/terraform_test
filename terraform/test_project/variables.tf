@@ -1,5 +1,5 @@
 variable "region" {
-  default     = "eu-central-1"
+  default = "eu-central-1"
 }
 
 variable "instance_type" {
@@ -20,4 +20,8 @@ variable "pass_length" {
 
 variable "http_port" {
   default = 80
+}
+
+variable "cidr_block" {
+  default = "10.0.0.0/16"
 }
