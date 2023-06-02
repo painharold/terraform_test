@@ -10,7 +10,7 @@ def addParametersToList() {
     )
 
     pipelineParametersList.add(
-        choice(name: 'Region', choices: regions, description: 'Choose region to deploy')
+        choice(name: 'Region', choices: regions, description: 'Choose region')
     )
 
     pipelineParametersList.add(
