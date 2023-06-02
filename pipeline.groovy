@@ -108,7 +108,7 @@ pipeline {
                                 terraform destroy -var="region=${params.Region}" --auto-approve
                             """
                         }
-                        println('------------------ Destroy destruction was successfully complete ------------------')
+                        println('------------------ Deployment destruction was successfully complete ------------------')
                     }
                 }
             }
