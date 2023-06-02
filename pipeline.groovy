@@ -6,15 +6,19 @@ def addParametersToList() {
     def cidrBlocks = ['10.0.0.0/16', '172.31.0.0/16', '192.168.0.0/20']
 
     pipelineParametersList.add(
-            choice(name: 'Action', choices: actions, description: getParamsDescription('Deploy Or Destroy'))
+        choice(name: 'Action', choices: actions, description: 'Deploy or destroy')
     )
 
     pipelineParametersList.add(
-            choice(name: 'Region', choices: regions, description: getParamsDescription('Choose Region To Deploy'))
+        choice(name: 'Region', choices: regions, description: 'Choose region to deploy')
     )
 
     pipelineParametersList.add(
-            choice(name: 'VPC_Cidr', choices: cidrBlocks, description: getParamsDescription('Choose Cidr Block'))
+        choice(name: 'VPC_Cidr', choices: cidrBlocks, description: 'Choose cidr block')
+    )
+
+    pipelineParametersList.add(
+        booleanParam(name: 'UpdatePipeline', defaultValue: false, description: 'Update pipeline configuration')
     )
 
     return pipelineParametersList
@@ -35,7 +39,7 @@ pipeline {
                     println('------------------ Stage: Update pipeline ------------------')
                     def parametersList = addParametersToList()
                     properties([parameters(parametersList)])
-                    if (params.UpdatePipeline.toBoolean()) {
+                    if (params.UpdatePipeline) {
                         currentBuild.description = 'Updating pipeline'
                         currentBuild.getRawBuild().getExecutor().interrupt(Result.SUCCESS)
                         // force stop build with success
@@ -47,29 +51,64 @@ pipeline {
                 }
             }
         }
-        stage('Deploy') {
+        stage('Git checkout') {
             steps {
                 script {
-                    println("------------------ Stage: Deploy to AWS in ${params.Region} ------------------")
-                    sh """
-                        terraform init
-                        terraform apply -var="region=${params.Region}" -var="cidr_block=${params.VPC_Cidr}" --auto-approve
-                    """
-                    println('------------------ Deployment was successfully completed ------------------')
+                    println("------------------ Stage: Download repository ------------------")
+                    git branch: 'jenkins', credentialsId: 'ssh_git',
+                        url: 'git@github.com:painharold/terraform_test.git'
+                    println('------------------ Repository was successfully downloaded ------------------')
+                }
+
+            }
+
+        }
+        stage('Deploy') {
+            when {
+                expression {
+                    params.Action == 'apply'
+                }
+            }
+            steps {
+                script {
+                    dir('terraform/test_project') {
+                        println("------------------ Stage: Deploy to AWS in ${params.Region} ------------------")
+                        withCredentials([string(credentialsId: 'key_id', variable: 'AWS_ACCESS_KEY_ID'),
+                                 string(credentialsId: 'access_key', variable: 'AWS_SECRET_ACCESS_KEY')]) {
+                            sh """
+                                terraform init
+                                terraform apply -var="region=${params.Region}" -var="cidr_block=${params.VPC_Cidr}" --auto-approve
+                            """
+                        }
+                        println('------------------ Deployment was successfully completed ------------------')
+                    }
                 }
             }
         }
         stage('Destroy') {
+            when {
+                expression {
+                    params.Action == 'destroy'
+                }
+            }
             steps {
                 script {
-                    println('------------------ Stage: Destroy deployment ------------------')
-                    sh """
-                        terraform init
-                        terraform destroy --auto-approve
-                    """
-                    println('------------------ Destroy destruction was successfully complete ------------------')
+                    dir('terraform/test_project') {
+                        println('------------------ Stage: Destroy deployment ------------------')
+                        withCredentials([string(credentialsId: 'key_id', variable: 'AWS_ACCESS_KEY_ID'),
+                                 string(credentialsId: 'access_key', variable: 'AWS_SECRET_ACCESS_KEY')]) {
+                            sh """
+                                terraform init
+                                terraform destroy --auto-approve
+                            """
+                        }
+                        println('------------------ Destroy destruction was successfully complete ------------------')
+                    }
                 }
             }
         }
+    }
+    finally {
+        cleanWs()
     }
 }
