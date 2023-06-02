@@ -30,7 +30,9 @@ pipeline {
         timestamps()
         timeout(time: 1, unit: 'HOURS')
     }
-    agent 'master'
+    agent {
+        'master'
+    }
 
     stages {
         stage('Update Pipeline') {
