@@ -107,8 +107,6 @@ pipeline {
                 }
             }
         }
-    }
-    finally {
         cleanWs()
     }
 }
