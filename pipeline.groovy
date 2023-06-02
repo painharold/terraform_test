@@ -3,7 +3,7 @@ def addParametersToList() {
     def pipelineParametersList = []
     def actions = ['apply', 'destroy']
     def regions = ['eu-central-1', 'eu-north-1', 'eu-west-1', 'ca-central-1', 'us-east-1']
-    def cidrBlocks = ['10.0.0.0/16', '172.31.0.0/16', '192.168.0.0/20']
+    def cidrBlocks = ['10.0.0.0/16', '172.31.0.0/16', '192.168.0.0/16']
 
     pipelineParametersList.add(
         choice(name: 'Action', choices: actions, description: 'Deploy or destroy')
