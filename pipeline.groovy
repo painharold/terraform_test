@@ -34,10 +34,6 @@ pipeline {
         label 'master'
     }
 
-    tools {
-        terraform 'terraform'
-    }
-
     stages {
         stage('Update Pipeline') {
             steps {
