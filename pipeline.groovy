@@ -50,8 +50,11 @@ pipeline {
                         currentBuild.getRawBuild().getExecutor().interrupt(Result.SUCCESS)
                         // force stop build with success
                         sleep(1)
-                    } else {
+                    } else if (params.Action == 'apply') {
                         currentBuild.description = "Deploy to ${params.Region}"
+                    }
+                    else {
+                        currentBuild.description = "Destroying resources in ${params.Region}"
                     }
                     println('------------------ Pipeline was successfully updated ------------------')
                 }
