@@ -9,7 +9,7 @@ provider "aws" {
 # Terraform Remote State
 terraform {
   backend "s3" {
-    bucket = "dmitry-maslov-my-terraform-test-project-state"
+    bucket = "dmitry-maslov-my-terraform-project-state"
     key    = "terraform_test_project/terraform.tfstate"
     region = "eu-central-1"
   }
