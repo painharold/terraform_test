@@ -3,7 +3,7 @@ variable "region" {
 }
 
 variable "instance_type" {
-  default = "t3.micro"
+  default = "t2.micro"
 }
 
 variable "asg_min_size" {
@@ -11,7 +11,7 @@ variable "asg_min_size" {
 }
 
 variable "asg_max_size" {
-  default = 3
+  default = 6
 }
 
 variable "pass_length" {

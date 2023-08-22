@@ -41,6 +41,7 @@ resource "aws_autoscaling_group" "web" {
   name                = "WebServer-ASG-Ver-${aws_launch_template.web.latest_version}"
   min_size            = var.asg_min_size
   max_size            = var.asg_max_size
+  desired_capacity    = length(module.vpc.aws_availability_zones)
   min_elb_capacity    = 2
   health_check_type   = "ELB"
   vpc_zone_identifier = module.vpc.public_subnets_id
