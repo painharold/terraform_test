@@ -4,3 +4,4 @@
 /test_project/terraform.tfstate
 /test_project/terraform.tfstate.backup
 /test_project/.terraform/
+/lib/
