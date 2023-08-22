@@ -11,7 +11,7 @@ variable "asg_min_size" {
 }
 
 variable "asg_max_size" {
-  default = 3
+  default = 6
 }
 
 variable "pass_length" {
