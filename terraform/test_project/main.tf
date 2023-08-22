@@ -44,7 +44,7 @@ resource "aws_autoscaling_group" "web" {
   desired_capacity    = length(module.vpc.aws_availability_zones)
   min_elb_capacity    = 2
   health_check_type   = "ELB"
-  vpc_zone_identifier = module.vpc.public_subnets_id
+  vpc_zone_identifier = module.vpc.private_subnets_id
   target_group_arns   = [aws_lb_target_group.web.arn]
 
   launch_template {
